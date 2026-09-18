@@ -1,0 +1,26 @@
+{
+  "name": "ruralbiz-ai",
+  "version": "2.0.0",
+  "private": true,
+  "description": "RuralBiz AI — MERN stack: hyper-local business & finance assistant for rural Indian micro-entrepreneurs.",
+  "scripts": {
+    "setup": "npm install && npm --prefix client install",
+    "build": "npm --prefix client run build",
+    "start": "node server/server.js",
+    "dev:server": "node server/server.js",
+    "dev:client": "npm --prefix client run dev",
+    "dev": "concurrently -k -n server,client \"npm run dev:server\" \"npm run dev:client\""
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "mongodb-memory-server": "^9.4.1",
+    "mongoose": "^8.4.0"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

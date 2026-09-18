@@ -1,0 +1,8 @@
+node_modules
+client/node_modules
+client/dist
+legacy
+.vercel
+*.log
+.env
+.DS_Store
