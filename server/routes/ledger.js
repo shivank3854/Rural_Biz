@@ -4,6 +4,7 @@ const express = require('express');
 const Ledger = require('../models/Ledger');
 const { requireAuth } = require('../middleware/auth');
 const { computeLedgerSummary } = require('../lib/data');
+const asyncH = require('../lib/asyncH');
 
 const router = express.Router();
 
@@ -24,12 +25,12 @@ function sanitizeRows(rows) {
   return clean;
 }
 
-router.get('/report', requireAuth, async (req, res) => {
+router.get('/report', requireAuth, asyncH(async (req, res) => {
   const doc = await Ledger.findOne({ user: req.user._id });
   res.json({ rows: (doc && doc.rows) || [] });
-});
+}));
 
-router.put('/report', requireAuth, async (req, res) => {
+router.put('/report', requireAuth, asyncH(async (req, res) => {
   const rows = sanitizeRows(req.body && req.body.rows);
   if (rows === null) return res.status(400).json({ error: 'ledger_rows_invalid' });
 
@@ -39,7 +40,7 @@ router.put('/report', requireAuth, async (req, res) => {
     { upsert: true, new: true }
   );
   res.json({ ok: true, count: rows.length });
-});
+}));
 
 router.post('/compute', (req, res) => {
   const rows = sanitizeRows(req.body && req.body.rows) || [];

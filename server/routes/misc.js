@@ -2,12 +2,13 @@
 
 const express = require('express');
 const Subscriber = require('../models/Subscriber');
+const asyncH = require('../lib/asyncH');
 
 const router = express.Router();
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-router.post('/newsletter', async (req, res) => {
+router.post('/newsletter', asyncH(async (req, res) => {
   const email = String((req.body && req.body.email) || '').trim().toLowerCase();
   if (!EMAIL_RE.test(email)) return res.status(400).json({ error: 'newsletter_bad_email' });
 
@@ -16,7 +17,7 @@ router.post('/newsletter', async (req, res) => {
 
   await Subscriber.create({ email });
   res.json({ ok: true, existed: false });
-});
+}));
 
 router.get('/health', (req, res) => {
   res.json({

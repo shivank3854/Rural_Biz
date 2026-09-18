@@ -6,6 +6,7 @@ const User = require('../models/User');
 const Session = require('../models/Session');
 const { hashPassword, verifyPassword } = require('../lib/pass');
 const { requireAuth, hashToken } = require('../middleware/auth');
+const asyncH = require('../lib/asyncH');
 
 const router = express.Router();
 
@@ -21,7 +22,7 @@ async function createSessionFor(user) {
   return token;
 }
 
-router.post('/signup', async (req, res) => {
+router.post('/signup', asyncH(async (req, res) => {
   const { name, email, phone, password } = req.body || {};
 
   if (!name || !String(name).trim()) return res.status(400).json({ error: 'auth_name_required' });
@@ -37,18 +38,27 @@ router.post('/signup', async (req, res) => {
   if (existing) return res.status(409).json({ error: 'auth_exists' });
 
   const passwordHash = await hashPassword(String(password));
-  const user = await User.create({
-    name: String(name).trim(),
-    email: hasEmail ? String(email).toLowerCase() : undefined,
-    phone: hasPhone ? String(phone) : undefined,
-    passwordHash,
-  });
+
+  let user;
+  try {
+    user = await User.create({
+      name: String(name).trim(),
+      email: hasEmail ? String(email).toLowerCase() : undefined,
+      phone: hasPhone ? String(phone) : undefined,
+      passwordHash,
+    });
+  } catch (err) {
+    if (err && err.code === 11000) {
+      return res.status(409).json({ error: 'auth_exists' });
+    }
+    throw err;
+  }
 
   const token = await createSessionFor(user);
   res.status(201).json({ user: publicUser(user), token });
-});
+}));
 
-router.post('/login', async (req, res) => {
+router.post('/login', asyncH(async (req, res) => {
   const { identifier, password } = req.body || {};
   if (!identifier || !password) return res.status(401).json({ error: 'auth_bad_creds' });
 
@@ -62,15 +72,15 @@ router.post('/login', async (req, res) => {
 
   const token = await createSessionFor(user);
   res.json({ user: publicUser(user), token });
-});
+}));
 
 router.get('/me', requireAuth, (req, res) => {
   res.json({ user: publicUser(req.user) });
 });
 
-router.post('/logout', requireAuth, async (req, res) => {
+router.post('/logout', requireAuth, asyncH(async (req, res) => {
   await Session.deleteOne({ _id: req.session._id });
   res.json({ ok: true });
-});
+}));
 
 module.exports = router;

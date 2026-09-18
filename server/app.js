@@ -24,12 +24,6 @@ function createApp() {
   app.use('/api/ledger', ledgerRoutes);
   app.use('/api', miscRoutes);       // /api/newsletter, /api/health
 
-  app.use((err, req, res, next) => {
-    console.error('[ruralbiz-ai] error:', err.message);
-    if (res.headersSent) return next(err);
-    res.status(500).json({ error: 'server_error' });
-  });
-
   if (fs.existsSync(path.join(DIST, 'index.html'))) {
     app.use(express.static(DIST));
     app.get('*', (req, res, next) => {
@@ -46,6 +40,18 @@ function createApp() {
       );
     });
   }
+
+  app.use('/api', (req, res) => {
+    res.status(404).json({ error: 'not_found', path: req.originalUrl });
+  });
+
+  app.use((err, req, res, next) => {
+    if (res.headersSent) return next(err);
+    const isBadJson = err && err.type === 'entity.parse.failed';
+    const status = isBadJson || (err && err.status === 400) ? 400 : ((err && err.status) || 500);
+    if (status >= 500) console.error('[ruralbiz-ai] error:', err.message);
+    res.status(status).json({ error: isBadJson ? 'bad_json' : ((err && err.code) || 'server_error') });
+  });
 
   return app;
 }
