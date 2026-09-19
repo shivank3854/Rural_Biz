@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "installCommand": "npm --prefix client install",
+  "installCommand": "MONGOMS_DISABLE_POSTINSTALL=true npm install && npm --prefix client install",
   "buildCommand": "npm --prefix client run build",
   "outputDirectory": "client/dist",
   "rewrites": [

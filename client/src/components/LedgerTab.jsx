@@ -103,7 +103,7 @@ Attach Aadhaar, PAN, and bank statements (last 6 months if available). Visit you
   };
 
   return (
-    <section className="tab-panel" id="tab-ledger">
+    <section className="tab-panel active" id="tab-ledger">
       <div className="card">
         <h2 style={{ fontSize: '1.05rem' }}>{tr('ledgerScanTitle')}</h2>
         <input type="file" id="ledger-image" accept="image/*" onChange={(e) => scan(e.target.files[0])} />

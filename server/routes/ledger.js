@@ -3,6 +3,7 @@
 const express = require('express');
 const Ledger = require('../models/Ledger');
 const { requireAuth } = require('../middleware/auth');
+const dbGuard = require('../middleware/dbGuard');
 const { computeLedgerSummary } = require('../lib/data');
 const asyncH = require('../lib/asyncH');
 
@@ -25,12 +26,12 @@ function sanitizeRows(rows) {
   return clean;
 }
 
-router.get('/report', requireAuth, asyncH(async (req, res) => {
+router.get('/report', dbGuard, requireAuth, asyncH(async (req, res) => {
   const doc = await Ledger.findOne({ user: req.user._id });
   res.json({ rows: (doc && doc.rows) || [] });
 }));
 
-router.put('/report', requireAuth, asyncH(async (req, res) => {
+router.put('/report', dbGuard, requireAuth, asyncH(async (req, res) => {
   const rows = sanitizeRows(req.body && req.body.rows);
   if (rows === null) return res.status(400).json({ error: 'ledger_rows_invalid' });
 

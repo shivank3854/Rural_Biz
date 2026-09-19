@@ -10,6 +10,7 @@ const feasRoutes = require('./routes/feasibility');
 const chatRoutes = require('./routes/chat');
 const ledgerRoutes = require('./routes/ledger');
 const miscRoutes = require('./routes/misc');
+const dbGuard = require('./middleware/dbGuard');
 
 const DIST = path.join(__dirname, '..', 'client', 'dist');
 
@@ -18,7 +19,7 @@ function createApp() {
   app.use(cors());
   app.use(express.json({ limit: '1mb' }));
 
-  app.use('/api/auth', authRoutes);
+  app.use('/api/auth', dbGuard, authRoutes);
   app.use('/api', feasRoutes);       // /api/feasibility, /api/schemes/match
   app.use('/api', chatRoutes);       // /api/chat
   app.use('/api/ledger', ledgerRoutes);

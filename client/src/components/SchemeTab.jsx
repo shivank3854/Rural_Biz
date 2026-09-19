@@ -53,7 +53,7 @@ export default function SchemeTab() {
   };
 
   return (
-    <section className="tab-panel" id="tab-scheme">
+    <section className="tab-panel active" id="tab-scheme">
       <div className="card">
         <h2 style={{ fontSize: '1.05rem' }}>{tr('schemeCardTitle')}</h2>
         <div className="row">

@@ -3,12 +3,13 @@
 const express = require('express');
 const Subscriber = require('../models/Subscriber');
 const asyncH = require('../lib/asyncH');
+const dbGuard = require('../middleware/dbGuard');
 
 const router = express.Router();
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-router.post('/newsletter', asyncH(async (req, res) => {
+router.post('/newsletter', dbGuard, asyncH(async (req, res) => {
   const email = String((req.body && req.body.email) || '').trim().toLowerCase();
   if (!EMAIL_RE.test(email)) return res.status(400).json({ error: 'newsletter_bad_email' });
 

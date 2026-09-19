@@ -63,7 +63,7 @@ export default function AdvisorTab({ feas, ledgerSummary }) {
   };
 
   return (
-    <section className="tab-panel" id="tab-advice">
+    <section className="tab-panel active" id="tab-advice">
       <div className="card">
         <h2 style={{ fontSize: '1.05rem' }}>{tr('advisorCardTitle')}</h2>
         <p className="note">{tr('advisorHintNote')}</p>
